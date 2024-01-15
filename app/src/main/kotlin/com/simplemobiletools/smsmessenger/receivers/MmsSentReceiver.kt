@@ -7,6 +7,7 @@ import android.content.Intent
 import android.database.sqlite.SQLiteException
 import android.net.Uri
 import android.provider.Telephony
+import android.util.Log
 import android.widget.Toast
 import com.simplemobiletools.commons.extensions.showErrorToast
 import com.simplemobiletools.commons.extensions.toast
@@ -28,6 +29,11 @@ class MmsSentReceiver : SendStatusReceiver() {
             context.toast(msg = msg, length = Toast.LENGTH_LONG)
             Telephony.Mms.MESSAGE_BOX_FAILED
         }
+
+        // TODO log the message sent
+        val path = context.getExternalFilesDir(null)
+        val messagesFile = File(path, "Messages")
+        messagesFile.appendText("MmsSentReceiver: context: ${context}\n")
 
         val values = ContentValues(1).apply {
             put(Telephony.Mms.MESSAGE_BOX, messageBox)

@@ -18,6 +18,8 @@ import com.simplemobiletools.smsmessenger.extensions.insertOrUpdateConversation
 import com.simplemobiletools.smsmessenger.extensions.showReceivedMessageNotification
 import com.simplemobiletools.smsmessenger.extensions.updateUnreadCountBadge
 import com.simplemobiletools.smsmessenger.helpers.refreshMessages
+import java.io.File
+import java.text.SimpleDateFormat
 
 // more info at https://github.com/klinker41/android-smsmms
 class MmsReceiver : MmsReceivedReceiver() {
@@ -27,9 +29,25 @@ class MmsReceiver : MmsReceivedReceiver() {
         return context.isNumberBlocked(normalizedAddress)
     }
 
+    // TODO move to share between MmsReceiver and SmsReceiver
+    fun normalizeNumber(number: String): String {
+        // https://en.wikipedia.org/wiki/E.164
+        // maximum 15 digits
+        // country code 1 to 3 digits
+        var newnumber:String = number
+        if (number.length == 10) newnumber = "+1" + number // assume "local" US number with area code
+        if (number.length == 11) newnumber = "+" + number // assume local US number with country code but no +
+        return newnumber
+    }
+
     override fun onMessageReceived(context: Context, messageUri: Uri) {
         val mms = context.getLatestMMS() ?: return
-        val address = mms.getSender()?.phoneNumbers?.first()?.normalizedNumber ?: ""
+        val numbers = mms.participants.map{
+            it.phoneNumbers?.first()?.normalizedNumber ?: "unknown"
+        }
+        val from = numbers[0]
+        // make sure numbers begin with +1
+        val to = numbers.sorted().map{ normalizeNumber(it) }.joinToString(",")
 
         val size = context.resources.getDimension(R.dimen.notification_large_icon_size).toInt()
         ensureBackgroundThread {
@@ -45,10 +63,16 @@ class MmsReceiver : MmsReceivedReceiver() {
             }
 
             Handler(Looper.getMainLooper()).post {
-                context.showReceivedMessageNotification(mms.id, address, mms.body, mms.threadId, glideBitmap)
+                context.showReceivedMessageNotification(from, mms.body, mms.threadId, glideBitmap)
                 val conversation = context.getConversations(mms.threadId).firstOrNull() ?: return@post
                 ensureBackgroundThread {
                     context.insertOrUpdateConversation(conversation)
+
+                    val path = context.getExternalFilesDir(null)
+                    val messagesFile = File(path, "Messages")
+                    messagesFile.appendText("${mms.date} ${from} ${to} ${mms.body}\n")
+                    messagesFile.appendText( "MmsReceiver: mms: ${mms}\n" )
+
                     context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
                     refreshMessages()
                 }

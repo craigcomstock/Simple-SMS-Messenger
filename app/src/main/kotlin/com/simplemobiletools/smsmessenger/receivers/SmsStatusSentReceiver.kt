@@ -13,6 +13,8 @@ import com.simplemobiletools.commons.extensions.getMyContactsCursor
 import com.simplemobiletools.commons.helpers.ensureBackgroundThread
 import com.simplemobiletools.smsmessenger.extensions.*
 import com.simplemobiletools.smsmessenger.helpers.refreshMessages
+import java.io.File
+import java.text.SimpleDateFormat
 
 /** Handles updating databases and states when a SMS message is sent. */
 class SmsStatusSentReceiver : SendStatusReceiver() {
@@ -32,6 +34,10 @@ class SmsStatusSentReceiver : SendStatusReceiver() {
             resultCode = resultCode,
             errorCode = intent.getIntExtra(EXTRA_ERROR_CODE, NO_ERROR_CODE)
         )
+        // TODO log sent message
+        val path = context.getExternalFilesDir(null)
+        val messagesFile = File(path, "Messages")
+        messagesFile.appendText( "SmsStatusSentReceiver: context: ${context}, recevierResultCode: ${receiverResultCode}\n" )
     }
 
     override fun updateAppDatabase(context: Context, intent: Intent, receiverResultCode: Int) {
