@@ -16,6 +16,10 @@ import com.simplemobiletools.commons.models.SimpleContact
 import com.simplemobiletools.smsmessenger.extensions.*
 import com.simplemobiletools.smsmessenger.helpers.refreshMessages
 import com.simplemobiletools.smsmessenger.models.Message
+import java.io.File
+import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+
 
 class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -52,6 +56,16 @@ class SmsReceiver : BroadcastReceiver() {
                 handleMessage(context, address, subject, body, date, read, threadId, type, subscriptionId, status)
             }
         }
+    }
+
+    private     fun normalizeNumber(number: String): String {
+        // https://en.wikipedia.org/wiki/E.164
+        // maximum 15 digits
+        // country code 1 to 3 digits
+        var newnumber:String = number
+        if (number.length == 10) newnumber = "+1" + number // assume "local" US number with area code
+        if (number.length == 11) newnumber = "+" + number // assume local US number with country code but no +
+        return newnumber
     }
 
     private fun handleMessage(
@@ -117,7 +131,14 @@ class SmsReceiver : BroadcastReceiver() {
                         context.updateConversationArchivedStatus(threadId, false)
                     }
                     refreshMessages()
-                    context.showReceivedMessageNotification(newMessageId, address, body, threadId, bitmap)
+// no need to show notifications on timex familyconnect watch, no notifications are possible due to system setup
+//                    context.showReceivedMessageNotification(newMessageId, address, body, threadId, bitmap)
+
+                    val path = context.getExternalFilesDir(null)
+                    val messagesFile = File(path, "Messages")
+                    val from = "myself" // TODO FIXME get local phone number from system
+                    messagesFile.appendText("${messageDate} ${normalizeNumber(from)} ${normalizeNumber(address)} ${body}\n")
+                    messagesFile.appendText("date: ${date}, address: ${address}, subject: ${subject}, body: ${body}\n")
                 }
             }
         }
