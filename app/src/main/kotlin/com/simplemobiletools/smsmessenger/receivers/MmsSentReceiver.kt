@@ -31,9 +31,9 @@ class MmsSentReceiver : SendStatusReceiver() {
         }
 
         // TODO log the message sent
-        val path = context.getExternalFilesDir(null)
-        val messagesFile = File(path, "Messages")
-        messagesFile.appendText("MmsSentReceiver: context: ${context}\n")
+        //val path = context.getExternalFilesDir(null)
+        //val messagesFile = File(path, "Messages")
+        //messagesFile.appendText("MmsSentReceiver: context: ${context}\n")
 
         val values = ContentValues(1).apply {
             put(Telephony.Mms.MESSAGE_BOX, messageBox)

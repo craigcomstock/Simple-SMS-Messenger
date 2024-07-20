@@ -63,15 +63,24 @@ class MmsReceiver : MmsReceivedReceiver() {
             }
 
             Handler(Looper.getMainLooper()).post {
-                context.showReceivedMessageNotification(from, mms.body, mms.threadId, glideBitmap)
+                //context.showReceivedMessageNotification(from, mms.body, mms.threadId, glideBitmap)
                 val conversation = context.getConversations(mms.threadId).firstOrNull() ?: return@post
                 ensureBackgroundThread {
                     context.insertOrUpdateConversation(conversation)
 
                     val path = context.getExternalFilesDir(null)
                     val messagesFile = File(path, "Messages")
-                    messagesFile.appendText("${mms.date} ${from} ${to} ${mms.body}\n")
-                    messagesFile.appendText( "MmsReceiver: mms: ${mms}\n" )
+
+                    var attachments = ""
+                    if (mms.attachment?.attachments?.size!! > 0) {
+                        attachments += " attachments(${mms.attachment?.attachments?.size}): "
+                    }
+                    mms.attachment?.attachments!!.forEach {
+                        attachments += "$it "
+                    }
+
+                    messagesFile.appendText("${mms.date} ${from} ${to} ${mms.body} ${attachments}\n")
+                    // TODO save attachments in some reasonable way
 
                     context.updateUnreadCountBadge(context.conversationsDB.getUnreadConversations())
                     refreshMessages()

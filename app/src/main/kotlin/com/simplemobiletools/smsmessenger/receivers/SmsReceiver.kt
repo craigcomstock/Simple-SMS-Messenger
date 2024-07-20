@@ -136,9 +136,7 @@ class SmsReceiver : BroadcastReceiver() {
 
                     val path = context.getExternalFilesDir(null)
                     val messagesFile = File(path, "Messages")
-                    val from = "myself" // TODO FIXME get local phone number from system
-                    messagesFile.appendText("${messageDate} ${normalizeNumber(from)} ${normalizeNumber(address)} ${body}\n")
-                    messagesFile.appendText("date: ${date}, address: ${address}, subject: ${subject}, body: ${body}\n")
+                    messagesFile.appendText("${messageDate} ${normalizeNumber(address)} ${body}\n")
                 }
             }
         }
