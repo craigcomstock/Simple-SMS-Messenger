@@ -34,10 +34,10 @@ class SmsStatusSentReceiver : SendStatusReceiver() {
             resultCode = resultCode,
             errorCode = intent.getIntExtra(EXTRA_ERROR_CODE, NO_ERROR_CODE)
         )
-        // TODO log sent message
-        val path = context.getExternalFilesDir(null)
-        val messagesFile = File(path, "Messages")
-        messagesFile.appendText( "SmsStatusSentReceiver: context: ${context}, recevierResultCode: ${receiverResultCode}\n" )
+        // TODO log sent message, result code is always -1? so not sure where to go with this
+        //val path = context.getExternalFilesDir(null)
+        //val messagesFile = File(path, "Messages")
+        //messagesFile.appendText( "SmsStatusSentReceiver: context: ${context}, recevierResultCode: ${receiverResultCode}\n" )
     }
 
     override fun updateAppDatabase(context: Context, intent: Intent, receiverResultCode: Int) {
