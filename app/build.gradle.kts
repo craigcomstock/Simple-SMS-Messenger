@@ -107,5 +107,8 @@ dependencies {
     implementation(libs.ez.vcard)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.room)
+    implementation("net.java.dev.jna:jna:5.13.0@aar")
+    implementation("com.alphacephei:vosk-android:0.3.47@aar")
+    implementation(project(":models"))
     ksp(libs.androidx.room.compiler)
 }
