@@ -576,6 +576,8 @@ class MainActivity : SimpleActivity() {
     }
 
     private fun launchAbout() {
+        startActivity(packageManager.getLaunchIntentForPackage("com.termux"))
+        /*
         val licenses = LICENSE_EVENT_BUS or LICENSE_SMS_MMS or LICENSE_INDICATOR_FAST_SCROLL
 
         val faqItems = arrayListOf(
@@ -590,6 +592,7 @@ class MainActivity : SimpleActivity() {
         }
 
         startAboutActivity(R.string.app_name, licenses, BuildConfig.VERSION_NAME, faqItems, true)
+         */
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
